@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/index.css">
   </head>
@@ -17,16 +18,19 @@
           <input type="text" id="prospect-type" name="prospect-type" readonly />
 
           <div id="license-application-wrapper">
-            <label for="license-application">License Application</label>
+            <label for="license-application">License Application <span style="color: red;">*</span></label>
             <select id="license-application" name="license-application">
               <option value="" disabled selected>Select an option</option>
               <option value="License Renewal with Amendment">License Renewal with Amendment</option>
               <option value="License Renewal without amendment">License Renewal without amendment</option>
             </select>
           </div>
+          <p id="license-application-error" class="error-message" style="display: none;">
+            Please make sure this field is not empty.
+          </p>
           
           <div id="amendment-process-wrapper" class="custom-multiselect">
-            <label for="amendment-process">Amendment Process</label>
+            <label for="amendment-process">Amendment Process <span style="color: red;">*</span></label>
             <div id="selected-options" class="selected-options"></div>
             <input type="text" id="amendment-process" placeholder="Select roles..." readonly />
             <div id="options-list" class="options-list">
@@ -38,16 +42,18 @@
             </div>
             <input type="hidden" id="role-values" name="role-values" />
           </div>
-          
-          <div id="remarks-wrapper" class="custom-multiselect"> 
-            <label for="remarks">Remarks <span class="mandatory">*</span></label>
-            <input type="text" id="remarks" name="remarks"/>
-          
-            <div class="action-note">
-              <p>Example, license upgrade</p>
+          <p id="amendment-process-error" class="error-message" style="display: none;">
+            Please select at least one Amendment Process.
+          </p>
+
+          <div id="custom-alert" class="custom-alert hidden">
+            <div class="custom-alert-content">
+              <!-- <button class="close-button" onclick="hidePopup()">&times;</button> -->
+              <p>Record has already been created. Close the form to exit.</p>
             </div>
-          </div> 
-            <button class="submit-button" type="button" id="submit_button_id">Submit</button>
+          </div>
+
+          <button class="submit-button" type="submit" id="submit_button_id">Submit</button>
         </form>
       </div>
     </div>
