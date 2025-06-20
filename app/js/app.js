@@ -1,4 +1,4 @@
-let dealId, accountId, dealType, accountJurisdiction, email, applicationId;
+let dealId, accountId, dealType, accountJurisdiction, email, applicationId, primaryContactId, contactName;
 
 function showCustomAlert(message) {
   const alertBox = document.getElementById("custom-alert");
@@ -122,6 +122,19 @@ function updateFieldVisibility() {
   }
 }
 
+// APPLICATION REMARKS TOGGLE
+function toggleRemarksField() {
+  const amendmentValues = amendmentProcessValue();
+  const remarksWrapper = document.getElementById("remarks-wrapper");
+
+  if (amendmentValues.includes("Others")) {
+    remarksWrapper.style.display = "block";
+  } else {
+    remarksWrapper.style.display = "none";
+  }
+}
+
+
 // Event handlers for custom multiselect
 optionsList.addEventListener("click", (e) => {
   if (e.target && e.target.dataset.value) {
@@ -137,6 +150,7 @@ optionsList.addEventListener("click", (e) => {
 
     updateRoleValues();
     updateFieldVisibility();
+    toggleRemarksField();
   }
 });
 
@@ -146,6 +160,7 @@ selectedOptionsContainer.addEventListener("click", (e) => {
     span.remove();
     updateRoleValues();
     updateFieldVisibility();
+    toggleRemarksField();
   }
 });
 
@@ -184,11 +199,15 @@ ZOHO.embeddedApp.on("PageLoad", async (entity) => {
     });
     
     const accountData = accountResponse.data[0];
+    console.log("Accounts Data: ", accountData);
     accountJurisdiction = accountData.Jurisdiction;
+    primaryContactId = accountData.Primary_Contact.id;
+    contactName = accountData.Primary_Contact.name;
 
     if (prospectTypeField) {
       prospectTypeField.value = dealType || "N/A";
       updateFieldVisibility();
+      toggleRemarksField();
     }
 
     // CHECK CREATE NEW LICENSE APPLICATION IF IT IS TRUE
@@ -228,12 +247,16 @@ async function create_record(event) {
   const licenseApplicationValue = document.getElementById("license-application").value;
   const amendmentValues = amendmentProcessValue();
   const prospectTypeFieldValue = document.getElementById("prospect-type").value;
+  const remarksValue = document.getElementById("remarks")?.value.trim();
 
   const licenseError = document.getElementById("license-application-error");
   const amendmentError = document.getElementById("amendment-process-error");
 
+  const remarksError = document.getElementById("remarks-error"); 
+
   licenseError.style.display = "none";
   amendmentError.style.display = "none";
+  remarksError.style.display = "none";
 
   if (prospectTypeFieldValue === "Renewal Trade License" && licenseApplicationValue === "") {
     licenseError.style.display = "block";
@@ -247,6 +270,14 @@ async function create_record(event) {
     isSubmitting = false;
     return;
   }
+
+  
+  if (licenseApplicationValue === "License Renewal with Amendment" && amendmentValues.includes("Others") && !remarksValue) {
+    remarksError.style.display = "block";
+    isSubmitting = false;
+    return;
+  }
+
 
   if (prospectTypeFieldValue === "Amendment Trade License" && amendmentValues.length === 0) {
     amendmentError.style.display = "block";
@@ -265,6 +296,10 @@ async function create_record(event) {
     email = "operations@tlz.ae";
   }
 
+  // get layout id based on license application value and amendment values
+  const isOthersSelected = licenseApplicationValue === "License Renewal with Amendment" && amendmentValues.includes("Others");
+  const layoutId = isOthersSelected ? "3769920000000570410" : "3769920000104212264";
+
   const applicationData = {
     Authority_Email_Address: email,
     Deal_Name: dealId,
@@ -272,11 +307,14 @@ async function create_record(event) {
     Account_Name: accountId,
     Type: dealType,
     License_Jurisdiction: accountJurisdiction,
-    Layout: "3769920000104212264",
+    Layout: layoutId,
     AML_Connected: true,
     New_Resident_Visa_Stage: "Start",
     License_Renewal_with_amendment: licenseApplicationValue,
     Type_of_Amendment: amendmentValues,
+    Employee_Name: primaryContactId,
+    PIC_Name: contactName,
+    License_Remarks: remarksValue,
   };
 
   try {
@@ -288,22 +326,23 @@ async function create_record(event) {
     const applicationId = appResponse.data[0].details.id;
     console.log("APPLICATION ID:", applicationId);
 
-    const licenseFormData = {
-      New_License_Application: applicationId,
-      Application_Stage: "Start",
-      Application_Type: dealType,
-      Application_Status: "In-Progress",
-      AML_Connected: true,
-      Layout: "3769920000261689839",
-    };
+    // validate license application and amendment process values
+    if (!isOthersSelected) {
+      const licenseFormResponse = await ZOHO.CRM.API.insertRecord({
+        Entity: "New_License_Forms",
+        APIData: {
+          New_License_Application: applicationId,
+          Application_Stage: "Start",
+          Application_Type: dealType,
+          Application_Status: "In-Progress",
+          AML_Connected: true,
+          Layout: "3769920000261689839",
+        },
+      });
 
-    const licenseFormResponse = await ZOHO.CRM.API.insertRecord({
-      Entity: "New_License_Forms",
-      APIData: licenseFormData,
-    });
-
-    const licenseFormId = licenseFormResponse.data[0].details.id;
-    console.log("LICENSE FORM ID:", licenseFormId);
+      const licenseFormId = licenseFormResponse.data[0].details.id;
+      console.log("LICENSE FORM ID:", licenseFormId);
+    }
 
     let license_url = "https://crm.zoho.com/crm/org682300086/tab/CustomModule3/" + applicationId;
     window.open(license_url, "_blank").focus();
