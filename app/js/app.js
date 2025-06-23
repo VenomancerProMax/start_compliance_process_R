@@ -1,4 +1,4 @@
-let dealId, accountId, dealType, accountJurisdiction, email, applicationId, primaryContactId, contactName;
+let quoteId, dealId, accountId, dealType, accountJurisdiction, email, applicationId, primaryContactId, contactName;
 
 function showCustomAlert(message) {
   const alertBox = document.getElementById("custom-alert");
@@ -180,6 +180,7 @@ ZOHO.embeddedApp.on("PageLoad", async (entity) => {
     });
 
     const quoteData = quoteResponse.data[0];
+    quoteId = quoteData.id;
     dealId = quoteData.Deal_Name.id;
 
     const dealResponse = await ZOHO.CRM.API.getRecord({
@@ -343,6 +344,18 @@ async function create_record(event) {
       const licenseFormId = licenseFormResponse.data[0].details.id;
       console.log("LICENSE FORM ID:", licenseFormId);
     }
+
+    // UPDATE QUOTES
+    const quoteData = {
+        id: quoteId,
+        Create_New_License_Application: true,
+      }
+
+    const updateQuotes = await ZOHO.CRM.API.updateRecord({
+      Entity: "Quotes",
+      APIData: quoteData,
+    });
+    console.log("UPDATE QUOTES RESPONSE:", updateQuotes);
 
     let license_url = "https://crm.zoho.com/crm/org682300086/tab/CustomModule3/" + applicationId;
     window.open(license_url, "_blank").focus();
