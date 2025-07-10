@@ -275,7 +275,8 @@ async function create_record(event) {
   }
 
   
-  if (licenseApplicationValue === "License Renewal with Amendment" && amendmentValues.includes("Others") && !remarksValue) {
+  if (prospectTypeFieldValue === "Amendment Trade License" && amendmentValues.includes("Others") &&
+  amendmentValues.length === 1 && !remarksValue) {
     remarksError.style.display = "block";
     isSubmitting = false;
     return;
@@ -299,9 +300,17 @@ async function create_record(event) {
     email = "operations@tlz.ae";
   }
 
-  // get layout id based on license application value and amendment values
-  const isOthersSelected = licenseApplicationValue === "License Renewal with Amendment" && amendmentValues.includes("Others");
-  const layoutId = isOthersSelected ? "3769920000000570410" : "3769920000104212264";
+    // get layout id based on prospect type value and amendment values
+    console.log("licenseApplicationValue:", prospectTypeFieldValue);
+    console.log("amendmentValues:", amendmentValues);
+
+    const isOthersSelected = 
+      prospectTypeFieldValue === "Amendment Trade License" &&
+      amendmentValues.length === 1 &&
+      amendmentValues[0].toLowerCase() === "others";
+
+    const layoutId = isOthersSelected ? "3769920000000570410" : "3769920000104212264";
+    console.log("layout id:", layoutId);
 
   const applicationData = {
     Authority_Email_Address: email,
