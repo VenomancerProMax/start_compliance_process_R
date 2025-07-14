@@ -213,6 +213,7 @@ ZOHO.embeddedApp.on("PageLoad", async (entity) => {
       toggleRemarksField();
     }
 
+
     // CHECK CREATE NEW LICENSE APPLICATION IF IT IS TRUE
     createNewLicenseApplication = quoteData.Create_New_License_Application;
     if (createNewLicenseApplication === true) {
@@ -267,6 +268,13 @@ async function create_record(event) {
     return;
   }
 
+  if (prospectTypeFieldValue === "Renewal Trade License" && amendmentValues.includes("Others") &&
+  amendmentValues.length === 1 && !remarksValue) {
+    remarksError.style.display = "block";
+    isSubmitting = false;
+    return;
+  }
+
 
   if (licenseApplicationValue === "License Renewal with Amendment" && amendmentValues.length === 0) {
     amendmentError.style.display = "block";
@@ -305,7 +313,7 @@ async function create_record(event) {
     console.log("amendmentValues:", amendmentValues);
 
     const isOthersSelected = 
-      prospectTypeFieldValue === "Amendment Trade License" &&
+      (prospectTypeFieldValue === "Amendment Trade License" || prospectTypeFieldValue === "Renewal Trade License") &&
       amendmentValues.length === 1 &&
       amendmentValues[0].toLowerCase() === "others";
 
