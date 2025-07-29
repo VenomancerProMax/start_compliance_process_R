@@ -258,44 +258,37 @@ async function create_record(event) {
 
   const remarksError = document.getElementById("remarks-error"); 
 
+  // ============================== Field values ==============================
+  const isRenewal = prospectTypeFieldValue === "Renewal Trade License";
+  const isAmendment = prospectTypeFieldValue === "Amendment Trade License";
+  const isRenewalWithAmendment = licenseApplicationValue === "License Renewal with Amendment";
+  const hasOthers = amendmentValues.includes(" Others") || amendmentValues.includes("Others");
+  const isRemarksEmpty = !remarksValue;
+
+  // ============================ Reset all errors ============================
   licenseError.style.display = "none";
   amendmentError.style.display = "none";
   remarksError.style.display = "none";
 
-  if (prospectTypeFieldValue === "Renewal Trade License" && licenseApplicationValue === "") {
+  if (isRenewal && licenseApplicationValue === "") {
     licenseError.style.display = "block";
     isSubmitting = false;
     return;
   }
 
-  if (prospectTypeFieldValue === "Renewal Trade License" && amendmentValues.includes("Others") && !remarksValue) {
-    remarksError.style.display = "block";
+  if ((isRenewalWithAmendment || isAmendment) && amendmentValues.length === 0) {
+    amendmentError.style.display = "block";
     isSubmitting = false;
     return;
   }
 
-
-  if (licenseApplicationValue === "License Renewal with Amendment" && amendmentValues.length === 0) {
-    amendmentError.style.display = "block";
+  if (hasOthers && isRemarksEmpty) {
+    remarksError.style.display = "block";
     isSubmitting = false;
     return;
   }
 
   
-  if (prospectTypeFieldValue === "Amendment Trade License" && amendmentValues.includes("Others") &&
-  amendmentValues.length === 1 && !remarksValue) {
-    remarksError.style.display = "block";
-    isSubmitting = false;
-    return;
-  }
-
-
-  if (prospectTypeFieldValue === "Amendment Trade License" && amendmentValues.length === 0) {
-    amendmentError.style.display = "block";
-    isSubmitting = false;
-    return;
-  }
-
   let email;
   if ( accountJurisdiction === "Ajman Free Zone" || accountJurisdiction === "Ajman Media City Free Zone") {
     email = "opsn@uaecsp.club";
@@ -312,9 +305,7 @@ async function create_record(event) {
     console.log("amendmentValues:", amendmentValues);
 
     const isOthersSelected = 
-      (prospectTypeFieldValue === "Amendment Trade License" || prospectTypeFieldValue === "Renewal Trade License") &&
-      amendmentValues.length === 1 &&
-      amendmentValues[0].toLowerCase() === "others";
+      (prospectTypeFieldValue === "Amendment Trade License" || prospectTypeFieldValue === "Renewal Trade License") &&  amendmentValues.some(v => v.toLowerCase() === "others");
 
     const layoutId = isOthersSelected ? "3769920000000570410" : "3769920000104212264";
     console.log("layout id:", layoutId);
