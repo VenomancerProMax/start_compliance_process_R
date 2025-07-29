@@ -129,7 +129,7 @@ function toggleRemarksField() {
 
   console.log(amendmentValues);
 
-  if (Array.isArray(amendmentValues) && amendmentValues.length === 1 && amendmentValues[0] === "Others") {
+  if (Array.isArray(amendmentValues) && amendmentValues.includes("Others")) {
     remarksWrapper.style.display = "block";
   } else {
     remarksWrapper.style.display = "none";
