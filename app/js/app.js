@@ -268,8 +268,7 @@ async function create_record(event) {
     return;
   }
 
-  if (prospectTypeFieldValue === "Renewal Trade License" && amendmentValues.includes("Others") &&
-  amendmentValues.length === 1 && !remarksValue) {
+  if (prospectTypeFieldValue === "Renewal Trade License" && amendmentValues.includes("Others") && !remarksValue) {
     remarksError.style.display = "block";
     isSubmitting = false;
     return;
