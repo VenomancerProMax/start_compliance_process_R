@@ -126,6 +126,7 @@ function updateFieldVisibility() {
 function toggleRemarksField() {
   const amendmentValues = amendmentProcessValue();
   const remarksWrapper = document.getElementById("remarks-wrapper");
+  const remarksField = document.getElementById("remarks");
 
   console.log(amendmentValues);
 
@@ -133,6 +134,7 @@ function toggleRemarksField() {
     remarksWrapper.style.display = "block";
   } else {
     remarksWrapper.style.display = "none";
+    if (remarksField) remarksField.value = "";
   }
 }
 
@@ -288,7 +290,6 @@ async function create_record(event) {
     return;
   }
 
-  
   let email;
   if ( accountJurisdiction === "Ajman Free Zone" || accountJurisdiction === "Ajman Media City Free Zone") {
     email = "opsn@uaecsp.club";
@@ -301,14 +302,12 @@ async function create_record(event) {
   }
 
     // get layout id based on prospect type value and amendment values
-    console.log("licenseApplicationValue:", prospectTypeFieldValue);
-    console.log("amendmentValues:", amendmentValues);
-
     const isOthersSelected = 
       (prospectTypeFieldValue === "Amendment Trade License" || prospectTypeFieldValue === "Renewal Trade License") &&  amendmentValues.some(v => v.toLowerCase() === "others");
 
     const layoutId = isOthersSelected ? "3769920000000570410" : "3769920000104212264";
-    console.log("layout id:", layoutId);
+    console.log("REMARKS VALUE: ", remarksValue);
+
 
   const applicationData = {
     Authority_Email_Address: email,
@@ -377,12 +376,6 @@ async function create_record(event) {
     isSubmitting = false;
   }
 }
-
-// function hidePopup() {
-//   console.log("HIDE");
-//   const popup = document.getElementById("custom-alert");
-//   popup.style.display = "none";
-// }
 
 document.getElementById("record-form").addEventListener("submit", create_record);
 
