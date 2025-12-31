@@ -303,7 +303,7 @@ async function create_record(event) {
 
     // get layout id based on prospect type value and amendment values
     const isOthersSelected = 
-      (prospectTypeFieldValue === "Amendment Trade License" || prospectTypeFieldValue === "Renewal Trade License") &&  amendmentValues.some(v => v.toLowerCase() === "others");
+      (prospectTypeFieldValue === "Amendment Trade License") && amendmentValues.some(v => v.toLowerCase() === "others");
 
     const layoutId = isOthersSelected ? "3769920000000570410" : "3769920000104212264";
     console.log("REMARKS VALUE: ", remarksValue);
