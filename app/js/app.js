@@ -292,7 +292,7 @@ async function create_record(event) {
 
   let email;
   if ( accountJurisdiction === "Ajman Free Zone" || accountJurisdiction === "Ajman Media City Free Zone") {
-    email = "opsn@uaecsp.club";
+    email = "operations@tlz.ae";
   } else if (accountJurisdiction === "International Free Zone Authority") {
     email = "partner@ifza.com";
   } else if (accountJurisdiction === "Sharjah Media City") {
